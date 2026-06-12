@@ -273,10 +273,11 @@ confusionMatrix(as.factor(df_test$pred_class),
 # --- 9b. ROC Curve and AUC ---
 roc_obj <- roc(df_test$Default, df_test$predicted_pd)
 
+png("roc_curve.png")
 plot(roc_obj,
      col  = "blue",
      main = "ROC Curve — Logistic Regression PD Model")
-ggsave("roc_curve.png")     
+dev.off()     
 
 cat("AUC:", round(auc(roc_obj), 4), "\n")
 
