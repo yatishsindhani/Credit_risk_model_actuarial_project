@@ -111,6 +111,7 @@ ggplot(df, aes(x = int_rate, fill = factor(Default))) +
                     labels = c("Fully Paid", "Defaulted")) +
   labs(title = "Interest Rate Distribution by Default Status",
        x = "Interest Rate (%)", y = "Count", fill = "Loan Status")
+ggsave("interest_rate_distribution.png")
 
 # Plot: Default rate by purpose
 ggplot(default_by_purpose, aes(x = reorder(purpose, default_rate),
@@ -119,7 +120,7 @@ ggplot(default_by_purpose, aes(x = reorder(purpose, default_rate),
   coord_flip() +
   labs(title = "Default Rate by Loan Purpose",
        x = "Purpose", y = "Default Rate (%)")
-
+ggsave("default_rate_by_purpose.png")
 
 
 # ============================================================
@@ -255,7 +256,7 @@ ggplot(df_test, aes(x = cibil_score, fill = factor(Default))) +
                     labels = c("Fully Paid", "Defaulted")) +
   labs(title = "CIBIL Score Distribution by Default Status",
        x = "CIBIL Score (300-900)", y = "Density", fill = "Loan Status")
-
+ggsave("cibil_score_distribution.png")
 
 
 # ============================================================
@@ -275,6 +276,7 @@ roc_obj <- roc(df_test$Default, df_test$predicted_pd)
 plot(roc_obj,
      col  = "blue",
      main = "ROC Curve — Logistic Regression PD Model")
+ggsave("roc_curve.png")     
 
 cat("AUC:", round(auc(roc_obj), 4), "\n")
 
@@ -333,6 +335,7 @@ ggplot(df_test, aes(x = predicted_pd, fill = factor(Default))) +
            label = "Threshold = 0.55", hjust = 0) +
   labs(title = "Predicted Probability of Default Distribution",
        x = "Predicted PD", y = "Density", fill = "Loan Status")
+ggsave("predicted_pd_distribution.png")
 
 # ============================================================
 # SECTION 10 — EXPECTED LOSS CALCULATION
@@ -360,3 +363,15 @@ ggplot(df_test, aes(x = expected_loss)) +
   geom_histogram(bins = 50, fill = "steelblue", color = "white") +
   labs(title = "Distribution of Expected Loss per Loan",
        x = "Expected Loss ($)", y = "Count")
+ggsave("expected_loss_distribution.png")
+
+
+# Actual loss based on real outcomes
+df_test$actual_loss <- df_test$Default * LGD * df_test$loan_amnt
+
+total_actual_loss <- sum(df_test$actual_loss)
+
+cat("Total Actual Loss:         $", round(total_actual_loss, 0), "\n")
+cat("Total Expected Loss:       $", round(total_EL, 0), "\n")
+cat("Difference:                $", round(total_EL - total_actual_loss, 0), "\n")
+cat("Ratio (EL / Actual):       ",  round(total_EL / total_actual_loss, 4), "\n")
